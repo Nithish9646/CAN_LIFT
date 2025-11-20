@@ -1,7 +1,6 @@
 #include<lpc21xx.h>
 #include "lcddriver.h"
 #define LED1 1<<16
-#define LED2 1<<17
 #define u8 unsigned int
 typedef struct can_rx
 {
@@ -16,8 +15,8 @@ void can_init(void);
 int main()
 {
 	rx m1;
-	IODIR0|=LED1|LED2;
-	IOSET0=LED1|LED2;
+	IODIR0|=LED1;
+	IOSET0=LED1;
 	can_init();
 	LCD_INIT();
 	while(1)
@@ -60,3 +59,4 @@ void can_rx(rx* m1)
 	}
 	C2CMR=(1<<2);
 }
+
