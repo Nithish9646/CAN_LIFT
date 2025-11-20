@@ -7,6 +7,7 @@
 #define DOWN 11
 #define EMG 12
 #define BUZZER 1<<16
+#define MOTOR 1<<17
 #define u8 unsigned int
 typedef struct can_tx
 {
@@ -23,14 +24,16 @@ int main()
 {
      static int count=0;
 	tx m1;	
-	IODIR0|=LED1|LED2|LED3|BUZZER;
-	IOSET0=LED1|LED2;
+	IODIR0|=LED1|LED2|LED3|BUZZER|MOTOR;
+	IOSET0=LED1|LED2|LED3;
 	can_init();
 	LCD_INIT();
 	m1.id=0x1AF;;
 	m1.rtr=0;
 	m1.dlc=4;
-	
+	LCD_CMD(0X01);
+		LCD_CMD(0X80);
+		STRING("GROUND FLOOR");
 	while(1)
 	{
 	  if(((IOPIN0>>UP)&1)==0)
@@ -172,5 +175,3 @@ void can_tx(tx m1)
 	C2CMR=(1<<0)|(1<<5);
 while((C2GSR&(1<<3))==0);
 }
-
-
