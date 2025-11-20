@@ -1,10 +1,11 @@
 #include<lpc21xx.h>
 #include "lcddriver.h"
-#define LED1 1<<19
-#define LED2 1<<20
-#define UP 11
-#define DOWN 12
-#define EMG 10
+#define LED1 1<<18
+#define LED2 1<<19
+#define LED3 1<<20
+#define UP 10
+#define DOWN 11
+#define EMG 12
 #define BUZZER 1<<16
 #define u8 unsigned int
 typedef struct can_tx
@@ -22,61 +23,124 @@ int main()
 {
      static int count=0;
 	tx m1;	
-	IODIR0|=LED1|LED2|BUZZER;
+	IODIR0|=LED1|LED2|LED3|BUZZER;
 	IOSET0=LED1|LED2;
 	can_init();
 	LCD_INIT();
 	m1.id=0x1AF;;
 	m1.rtr=0;
 	m1.dlc=4;
+	
 	while(1)
 	{
 	  if(((IOPIN0>>UP)&1)==0)
 	  {
-	  delay(150);
+	  delay(250);
 	  count++;
-	    
+	    if(count>3)
+			count=3;
+		  
 		if(count==1)
 		{
+		IOSET0=MOTOR;
+		delay(400);
+		IOCLR0=MOTOR;
 		LCD_CMD(0X01);
 		LCD_CMD(0X80);
 		STRING("FIRST FLOOR");
+		IOCLR0=LED1;
+		IOSET0=LED2;
+		IOSET0=LED3;
 		}
 		else if(count==2)
 		{
+		IOSET0=MOTOR;
+		delay(400);
+		IOCLR0=MOTOR;
 		LCD_CMD(0X01);
 		LCD_CMD(0X80);
 		STRING("SECOUND FLOOR");
+		IOCLR0=LED2;
+		IOSET0=LED1;
+		IOSET0=LED3;
 		}
-		IOCLR0=LED1;
+		else if(count==3)
+		{
+		IOSET0=MOTOR;
+		delay(400);
+		IOCLR0=MOTOR;
+		LCD_CMD(0X01);
+		LCD_CMD(0X80);
+		STRING("THIRD FLOOR");
+		IOCLR0=LED3;
+		IOSET0=LED2;
+		IOSET0=LED1;
+		}
 		m1.data1=count;
 		m1.data2=0;
 	    can_tx(m1);
 	  }
 	  else if(((IOPIN0>>DOWN)&1)==0)
 	  {
-	  delay(150);
+	  delay(250);
 	  count--;
+		  if(count<0)
+			  count=0;
 	  	if(count==1)
 		{
+		IOSET0=MOTOR;
+		delay(400);
+		IOCLR0=MOTOR;
 		LCD_CMD(0X01);
 		LCD_CMD(0X80);
 		STRING("FIRST FLOOR");
+		IOCLR0=LED1;
+		IOSET0=LED2;
+		IOSET0=LED3;
 		}
 	    else if(count==2)
 		{
+		IOSET0=MOTOR;
+		delay(400);
+		IOCLR0=MOTOR;
 		LCD_CMD(0X01);
 		LCD_CMD(0X80);
 		STRING("SECOUND FLOOR");
-		}
-	  	IOSET0=LED1;
 		IOCLR0=LED2;
+		IOSET0=LED1;
+		IOSET0=LED3;
+		}
+		else if(count==3)
+		{
+		IOSET0=MOTOR;
+		delay(400);
+		IOCLR0=MOTOR;
+		LCD_CMD(0X01);
+		LCD_CMD(0X80);
+		STRING("THIRD FLOOR");
+		IOCLR0=LED3;
+		IOSET0=LED2;
+		IOSET0=LED1;
+		}
+		else if(count==0)
+		{
+		IOSET0=MOTOR;
+		delay(400);
+		IOCLR0=MOTOR;
+		LCD_CMD(0X01);
+		LCD_CMD(0X80);
+		STRING("GROUND FLOOR");
+		}
 		m1.data1=count;
 		m1.data2=0;
 		can_tx(m1);
 	  }
 	  else if(((IOPIN0>>EMG)&1)==0)
 	  {
+		IOSET0=MOTOR;
+		delay(400);
+		IOCLR0=MOTOR;
+		count=0;
 		LCD_CMD(0X01);
 		LCD_CMD(0X80);
 		STRING("GROUND FLOOR");
@@ -108,4 +172,5 @@ void can_tx(tx m1)
 	C2CMR=(1<<0)|(1<<5);
 while((C2GSR&(1<<3))==0);
 }
+
 
